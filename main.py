@@ -6,6 +6,7 @@ from multiprocessing import Process
 import time
 from proc import run_fetcher, run_validator
 from api import api
+from proxyserver import proxyserver
 import multiprocessing
 
 # 进程锁
@@ -23,6 +24,7 @@ def main():
     processes.append(Item(target=run_fetcher.main, name='fetcher'))
     processes.append(Item(target=run_validator.main, name='validator'))
     processes.append(Item(target=api.main, name='api'))
+    processes.append(Item(target=proxyserver.main, name='proxyserver'))
 
     while True:
         for p in processes:

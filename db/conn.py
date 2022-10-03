@@ -11,7 +11,7 @@ import sqlite3
 import datetime
 import threading
 
-conn = sqlite3.connect(DATABASE_PATH, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+conn = sqlite3.connect(DATABASE_PATH, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES, check_same_thread = False)
 # 线程锁
 conn_lock = threading.Lock()
 # 进程锁
@@ -120,7 +120,8 @@ def getValidatedRandom(max_count):
     返回 : list[Proxy]
     """
     conn_lock.acquire()
-    proc_lock.acquire()
+    if proc_lock:
+        proc_lock.acquire()
     if max_count > 0:
         r = conn.execute('SELECT * FROM proxies WHERE validated=? ORDER BY RANDOM() LIMIT ?', (True, max_count))
     else:
@@ -128,7 +129,8 @@ def getValidatedRandom(max_count):
     proxies = [Proxy.decode(row) for row in r]
     r.close()
     conn_lock.release()
-    proc_lock.release()
+    if proc_lock:
+        proc_lock.release()
     return proxies
 
 def pushFetcherResult(name, proxies_cnt):
