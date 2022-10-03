@@ -123,7 +123,7 @@ def handle(client):
     :param client:
     :return:
     """
-    timeout = 3
+    timeout = 5
     client.settimeout(timeout)
     header = Header(client)
     if not header.data:
