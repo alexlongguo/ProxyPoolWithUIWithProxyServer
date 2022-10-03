@@ -111,6 +111,11 @@ def validate_thread(in_que, out_que):
                 if validate_once(proxy):
                     end_time = time.time()
                     latency = int((end_time-start_time)*1000)
+                    #if latency > 1000:
+                    #    print("proxy slow,time > 1000ms,pass", proxy.ip, proxy.port, latency)
+                    #    break
+                    #else:
+                    #    print("proxy fast,time < 1000ms", proxy.ip, proxy.port, latency)
                     success = True
                     break
             except Exception as e:

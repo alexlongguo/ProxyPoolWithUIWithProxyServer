@@ -113,7 +113,7 @@ def pushValidateResult(proxy, success, latency):
     conn_lock.release()
     proc_lock.release()
 
-def getValidatedRandom(max_count):
+def getValidatedRandom(max_count,latency=100000):
     """
     从通过了验证的代理中，随机选择max_count个代理返回
     max_count<=0表示不做数量限制
@@ -123,9 +123,9 @@ def getValidatedRandom(max_count):
     if proc_lock:
         proc_lock.acquire()
     if max_count > 0:
-        r = conn.execute('SELECT * FROM proxies WHERE validated=? ORDER BY RANDOM() LIMIT ?', (True, max_count))
+        r = conn.execute('SELECT * FROM proxies WHERE validated=? and latency<? ORDER BY RANDOM() LIMIT ?', (True, latency, max_count))
     else:
-        r = conn.execute('SELECT * FROM proxies WHERE validated=? ORDER BY RANDOM()', (True,))
+        r = conn.execute('SELECT * FROM proxies WHERE validated=? and latency<? ORDER BY RANDOM()', (True, latency,))
     proxies = [Proxy.decode(row) for row in r]
     r.close()
     conn_lock.release()

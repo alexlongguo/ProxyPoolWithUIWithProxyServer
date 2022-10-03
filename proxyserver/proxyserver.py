@@ -148,7 +148,7 @@ def handle(client):
             server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             #ptype,proxyHost,proxyPort = get_proxy_by_url()
             ptype,proxyHost,proxyPort = get_proxy()
-            print("==========>>>>>>>>> ",header.get_host_info()[0],header.get_host_info()[1], header.get_method().decode('utf-8'),"use proxy:", ptype,proxyHost,proxyPort)
+            #print("==========>>>>>>>>> ",header.get_host_info()[0],header.get_host_info()[1], header.get_method().decode('utf-8'),"use proxy:", ptype,proxyHost,proxyPort)
             if ptype == "http":
                 ptype = socks.PROXY_TYPE_HTTP
             if ptype == "https":
@@ -172,6 +172,7 @@ def handle(client):
             #print("11111",e)
             #traceback.print_exc()
     try:
+        print("==========>>>>>>>>> ",header.get_host_info()[0],header.get_host_info()[1], header.get_method().decode('utf-8'),"use proxy:", ptype,proxyHost,proxyPort)
         if header.is_ssl():
             data = b"HTTP/1.0 200 Connection Established\r\n\r\n"
             client.sendall(data)
@@ -212,12 +213,12 @@ def enable_ip():
     return ip[tag]
 
 def get_proxy():
-    proxies = conn.getValidatedRandom(1)
+    proxies = conn.getValidatedRandom(1, 1000)
     if len(proxies) > 0:
         p = proxies[0] 
         return p.protocol, p.ip, p.port
     else:
-        return "", "", ""
+        return "", "", 0
     
 def get_proxy_by_url():
     try:
