@@ -49,6 +49,28 @@ def fetch_all():
 
 ############# 以下API主要给网页使用 ################
 
+from functools import wraps
+from flask import Response
+def check_auth(username, password):
+    return username == 'admin' and password == 'secret'
+
+def authenticate():
+    """Sends a 401 response that enables basic auth"""
+    return Response(
+    'Could not verify your access level for that URL.'
+    'You have to login with proper credentials', 401,
+    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
+
+
 @app.route('/')
 def index():
     return redirect('/web')
@@ -82,6 +104,7 @@ def proxies_status():
 
 # 获取爬取器状态
 @app.route('/fetchers_status', methods=['GET'])
+@requires_auth
 def fetchers_status():
     proxies = conn.getValidatedRandom(-1) # 获取所有可用代理
     fetchers = conn.getAllFetchers()
